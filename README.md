@@ -34,10 +34,10 @@ Dependencias de desarrollo:
 
 1. Clonar el repositorio
  ```sh
-   git clone https://github.com/SrSujeto55/Proyecto02.git
+   git clone https://github.com/julian-rosas/geometric-figure-clasifier.git
 ```
  ```sh
-   cd Proyecto02
+   cd geometric-figure-clasifier
 ```
 
 ## Pruebas unitarias
@@ -67,4 +67,4 @@ Ricardo Flores Mata - ricardo_fm77@ciencias.unam.mx
 
 Emiliano López Prado - emilianolp@ciencias.unam.mx
 
-Link del proyecto - https://github.com/SrSujeto55/Proyecto02
+Link del proyecto - https://github.com/julian-rosas/geometric-figure-clasifier.git
