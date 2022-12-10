@@ -30,7 +30,7 @@ class FigureImage
     public void Clasificate()
     {
         foreach(Figure fig in _figures){
-            FigureClasificator.Clasificate(fig);
+            FigureClasifier.Clasificate(fig);
         }
     }
     
