@@ -24,19 +24,19 @@ class FigureClasificator
         Bitmap originalImage = figure.GetBitmap();
         int[] figureSignal = RayCasting(figure, 90, 450);
 
-        int Smoother = originalImage.Width < 120 ? 8 : 15;
+        int smoother = originalImage.Width < 120 ? 8 : 15;
 
-        LinkedList<int> smootherSignal = SmoothSignal(figureSignal, Smoother);
+        LinkedList<int> smoothSignal = SmoothSignal(figureSignal, smoother);
 
-        int [] ARRSmoothSignal = smootherSignal.ToArray();
-        Array.Sort(ARRSmoothSignal);
+        int [] smoothSignalArr = smoothSignal.ToArray();
+        Array.Sort(smoothSignalArr);
 
-        if(IsCircle(ARRSmoothSignal)){
+        if(IsCircle(smoothSignalArr)){
             figure.SetGroup(FigureGroups.Circles);
             return;
         }
         
-        int numberOfPeaks = GetFigurePeaks(smootherSignal);
+        int numberOfPeaks = GetFigurePeaks(smoothSignal);
         figure.SetGroup(GetFigureGroup(numberOfPeaks));
     }
 
@@ -86,8 +86,8 @@ class FigureClasificator
         int[] figureSignal = new int[360];
 
         int[] figureCenter = GetFigureCenter(figure);
-        int XCenter = figureCenter[0];
-        int YCenter = figureCenter[1];
+        int xCenter = figureCenter[0];
+        int yCenter = figureCenter[1];
 
         Color figureColor = figure.GetColor();
         Bitmap filteredFigure = figure.GetBitmap();
@@ -101,34 +101,34 @@ class FigureClasificator
             double unitX = Math.Cos(radVersion)*hypotenuse;
             double unitY = Math.Sin(radVersion)*hypotenuse;
 
-            unitX = XCenter + unitX;
-            unitY = YCenter + unitY;
+            unitX = xCenter + unitX;
+            unitY = yCenter + unitY;
 
-            double dx = XCenter - unitX;
-            double dy = YCenter - unitY;
+            double dx = xCenter - unitX;
+            double dy = yCenter - unitY;
 
             int stepsNumber = Math.Max(Math.Abs((int)dx), Math.Abs((int)dy));
 
-            double XCoord = XCenter;
-            double YCoord = YCenter;
+            double xCoord = xCenter;
+            double yCoord = yCenter;
 
             bool thresholdReached = false;
-            int RayLength = 1;
+            int rayLength = 1;
 
             while (!thresholdReached)
             {
-                YCoord += dy/stepsNumber;
-                XCoord += dx/stepsNumber;
+                yCoord += dy/stepsNumber;
+                xCoord += dx/stepsNumber;
 
-                if(!filteredFigure.GetPixel((int)Math.Ceiling(XCoord), (int)Math.Ceiling(YCoord)).Equals(figureColor))
+                if(!filteredFigure.GetPixel((int)Math.Ceiling(xCoord), (int)Math.Ceiling(yCoord)).Equals(figureColor))
                 {
                     thresholdReached = true;
                     break;
                 }
-                RayLength++;
+                rayLength++;
             }
 
-            figureSignal[index] = RayLength;
+            figureSignal[index] = rayLength;
             index++;
         }
         return figureSignal;
@@ -181,33 +181,33 @@ class FigureClasificator
     /// 
     /// <param name="smoothSignal"> La señal suavizada a trabajar</param>
     /// <return> numberPeaks, el número de picos máximos registrados </return>
-    private static int GetFigurePeaks(LinkedList<int> smoothSignal)
+    private static int GetFigurePeaks(LinkedList<int> smoothSignalList)
     {
-        int[] arrSmoothSignal = smoothSignal.ToArray();
-        int Baseline = (int)arrSmoothSignal.Average();
-        int numberPeaks = 0;
-        bool isAcending = false;
+        int[] smoothSignalArr = smoothSignalList.ToArray();
+        int baseline = (int)smoothSignalArr.Average();
+        int peakNum = 0;
+        bool isAscending = false;
 
-        for(int i = 1; i< arrSmoothSignal.Length-1; i++)
+        for(int i = 1; i< smoothSignalArr.Length-1; i++)
         {
-            int LasDelta = arrSmoothSignal[i] - arrSmoothSignal[i-1];
-            int DeltaInFront = arrSmoothSignal[i+1] - arrSmoothSignal[i];
-            if (LasDelta > 0)
-                isAcending = true;
-            if (LasDelta < 0)
-                isAcending = false;
-            if (arrSmoothSignal[i] < Baseline)
+            int lastDelta = smoothSignalArr[i] - smoothSignalArr[i-1];
+            int nextDelta = smoothSignalArr[i+1] - smoothSignalArr[i];
+            if (lastDelta > 0)
+                isAscending = true;
+            if (lastDelta < 0)
+                isAscending = false;
+            if (smoothSignalArr[i] < baseline)
                 continue;
-            if ((LasDelta > 0 && DeltaInFront < 0) || (LasDelta == 0 && DeltaInFront < 0) && isAcending)
+            if ((lastDelta > 0 && nextDelta < 0) || (lastDelta == 0 && nextDelta < 0) && isAscending)
             {
-                numberPeaks++;
-                isAcending = false;
+                peakNum++;
+                isAscending = false;
             }
         }
-        if (isAcending)
-            numberPeaks++;
+        if (isAscending)
+            peakNum++;
 
-        return numberPeaks;
+        return peakNum;
     }
 
     /// <summary>
